@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>1440</width><height>960</height></rect></property>
+  <property name="windowTitle"><string>圆心识别与圆拟合</string></property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="mainLayout">
+    <property name="spacing"><number>8</number></property>
+    <property name="leftMargin"><number>6</number></property>
+    <property name="topMargin"><number>6</number></property>
+    <property name="rightMargin"><number>6</number></property>
+    <property name="bottomMargin"><number>6</number></property>
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation"><enum>Qt::Horizontal</enum></property>
+      <property name="childrenCollapsible"><bool>false</bool></property>
+      <widget class="ImageView" name="imageView"/>
+      <widget class="QWidget" name="controlPanel">
+       <property name="minimumSize"><size><width>530</width><height>0</height></size></property>
+       <layout class="QVBoxLayout" name="panelLayout" stretch="0,0,0,0,1,0,0">
+        <property name="spacing"><number>8</number></property>
+        <property name="leftMargin"><number>8</number></property>
+        <property name="topMargin"><number>0</number></property>
+        <property name="rightMargin"><number>0</number></property>
+        <property name="bottomMargin"><number>0</number></property>
+        <item>
+         <layout class="QHBoxLayout" name="buttonLayout">
+          <item><widget class="QPushButton" name="openButton"><property name="text"><string>打开图片</string></property></widget></item>
+          <item><widget class="QPushButton" name="detectButton"><property name="enabled"><bool>false</bool></property><property name="text"><string>识别并拟合</string></property></widget></item>
+          <item><widget class="QPushButton" name="fitButton"><property name="text"><string>适应窗口</string></property></widget></item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="imageInfoLabel">
+          <property name="text"><string>请打开图片</string></property>
+          <property name="wordWrap"><bool>true</bool></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="parametersGroup">
+          <property name="title"><string>检测参数</string></property>
+          <layout class="QFormLayout" name="parametersLayout">
+           <item row="0" column="0"><widget class="QLabel" name="minRadiusLabel"><property name="text"><string>最小半径（像素）</string></property></widget></item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="minRadiusSpin">
+             <property name="decimals"><number>1</number></property>
+             <property name="minimum"><double>1.000000000000000</double></property>
+             <property name="maximum"><double>100000.000000000000000</double></property>
+             <property name="value"><double>15.000000000000000</double></property>
+            </widget>
+           </item>
+           <item row="1" column="0"><widget class="QLabel" name="maxRadiusLabel"><property name="text"><string>最大半径（像素）</string></property></widget></item>
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="maxRadiusSpin">
+             <property name="specialValueText"><string>自动：短边的 20%</string></property>
+             <property name="decimals"><number>1</number></property>
+             <property name="maximum"><double>100000.000000000000000</double></property>
+            </widget>
+           </item>
+           <item row="2" column="0"><widget class="QLabel" name="circularityLabel"><property name="text"><string>最小圆度</string></property></widget></item>
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="circularitySpin">
+             <property name="minimum"><double>0.010000000000000</double></property>
+             <property name="maximum"><double>1.000000000000000</double></property>
+             <property name="singleStep"><double>0.050000000000000</double></property>
+             <property name="value"><double>0.750000000000000</double></property>
+            </widget>
+           </item>
+           <item row="3" column="0"><widget class="QLabel" name="fitErrorLabel"><property name="text"><string>最大相对误差（%）</string></property></widget></item>
+           <item row="3" column="1">
+            <widget class="QDoubleSpinBox" name="fitErrorSpin">
+             <property name="toolTip"><string>轮廓点到拟合圆的径向均方根误差除以半径，数值越小要求越严格。</string></property>
+             <property name="decimals"><number>1</number></property>
+             <property name="minimum"><double>0.100000000000000</double></property>
+             <property name="maximum"><double>100.000000000000000</double></property>
+             <property name="value"><double>7.000000000000000</double></property>
+            </widget>
+           </item>
+           <item row="4" column="0"><widget class="QLabel" name="foregroundLabel"><property name="text"><string>目标极性</string></property></widget></item>
+           <item row="4" column="1">
+            <widget class="QComboBox" name="foregroundCombo">
+             <item><property name="text"><string>暗圆 / 亮背景</string></property></item>
+             <item><property name="text"><string>亮圆 / 暗背景</string></property></item>
+            </widget>
+           </item>
+           <item row="5" column="0" colspan="2">
+            <widget class="QCheckBox" name="autoThresholdCheck">
+             <property name="text"><string>自动阈值</string></property>
+             <property name="checked"><bool>true</bool></property>
+            </widget>
+           </item>
+           <item row="6" column="0"><widget class="QLabel" name="thresholdLabel"><property name="text"><string>手动阈值</string></property></widget></item>
+           <item row="6" column="1">
+            <widget class="QSpinBox" name="thresholdSpin">
+             <property name="enabled"><bool>false</bool></property>
+             <property name="maximum"><number>255</number></property>
+             <property name="value"><number>128</number></property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item><widget class="QLabel" name="summaryLabel"><property name="text"><string>尚未识别</string></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+        <item>
+         <widget class="QTabWidget" name="resultsTabs">
+          <property name="minimumSize"><size><width>0</width><height>230</height></size></property>
+          <property name="currentIndex"><number>0</number></property>
+          <widget class="QWidget" name="logTab">
+           <attribute name="title"><string>识别记录</string></attribute>
+           <layout class="QVBoxLayout" name="logLayout">
+            <property name="leftMargin"><number>0</number></property>
+            <property name="topMargin"><number>0</number></property>
+            <property name="rightMargin"><number>0</number></property>
+            <property name="bottomMargin"><number>0</number></property>
+            <item>
+             <widget class="QPlainTextEdit" name="resultEdit">
+              <property name="readOnly"><bool>true</bool></property>
+              <property name="placeholderText"><string>这里显示每次识别的图片、参数、圆心、半径和拟合误差。</string></property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tableTab">
+           <attribute name="title"><string>结果表格</string></attribute>
+           <layout class="QVBoxLayout" name="tableLayout">
+            <property name="leftMargin"><number>0</number></property>
+            <property name="topMargin"><number>0</number></property>
+            <property name="rightMargin"><number>0</number></property>
+            <property name="bottomMargin"><number>0</number></property>
+            <item>
+             <widget class="QTableWidget" name="resultsTable">
+              <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+              <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+              <property name="rowCount"><number>0</number></property>
+              <property name="columnCount"><number>7</number></property>
+              <column><property name="text"><string>编号</string></property></column>
+              <column><property name="text"><string>圆心 X</string></property></column>
+              <column><property name="text"><string>圆心 Y</string></property></column>
+              <column><property name="text"><string>半径</string></property></column>
+              <column><property name="text"><string>直径</string></property></column>
+              <column><property name="text"><string>拟合误差</string></property></column>
+              <column><property name="text"><string>圆度</string></property></column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="noteLabel">
+          <property name="text"><string>坐标以原图左上角为原点，长度单位为像素。
+绿色圆为拟合轮廓，红色小十字为圆心。滚轮缩放，拖动平移。</string></property>
+          <property name="wordWrap"><bool>true</bool></property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="exportLayout">
+          <item><widget class="QPushButton" name="clearLogButton"><property name="text"><string>清空记录</string></property></widget></item>
+          <item><widget class="QPushButton" name="exportButton"><property name="text"><string>导出结果 CSV</string></property></widget></item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ImageView</class>
+   <extends>QGraphicsView</extends>
+   <header>ImageView.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>openButton</tabstop><tabstop>detectButton</tabstop><tabstop>fitButton</tabstop>
+  <tabstop>minRadiusSpin</tabstop><tabstop>maxRadiusSpin</tabstop><tabstop>circularitySpin</tabstop>
+  <tabstop>fitErrorSpin</tabstop><tabstop>foregroundCombo</tabstop><tabstop>autoThresholdCheck</tabstop>
+  <tabstop>thresholdSpin</tabstop><tabstop>resultEdit</tabstop><tabstop>clearLogButton</tabstop><tabstop>exportButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

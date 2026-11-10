@@ -4,3 +4,5 @@ debug/
 .cache/
 compile_commands.json
 .vscode/
+build/
+test*/
