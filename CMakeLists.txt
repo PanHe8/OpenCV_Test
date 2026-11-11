@@ -13,8 +13,9 @@ set(VISION_OPENCV_ROOT
     PATH    #PATH 表示这是一个目录路径，在 CMake GUI 里会显示为带“浏览…”按钮
     "OpenCV root的根目录" #文档字符串，提示这个变量
 )
-
 set(VISION_IMAGE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/images")
+
+set(target_var VisionDemo)
 
 option(VISION_USE_BUNDLED_OPENCV "使用项目自带的 MSVC x64 OpenCV, 而不是通过 find_package 查找 of find_package" ON)
 
@@ -113,7 +114,7 @@ if(Qt5Widgets_FOUND OR Qt6Widgets_FOUND)
 endif()
 
 # ============================可执行文件的编译==========================
-add_executable(VisionDemo WIN32
+add_executable(${target_var} WIN32
     main.cpp
     io/ImageDocument.h
     io/ImageDocument.cpp
@@ -124,38 +125,72 @@ add_executable(VisionDemo WIN32
     MainWindow.ui
 )
 
-set_target_properties(VisionDemo PROPERTIES
+set_target_properties(${target_var} PROPERTIES
     AUTOMOC ON
     AUTOUIC ON
     AUTOMOC ON
 )
-target_link_libraries(VisionDemo PRIVATE
+target_link_libraries(${target_var} PRIVATE
     Qt5::Widgets
     Qt5::Core
     circle_detection::circle_detection
 )
 
-Copy_OpenCV_Lib(VisionDemo)
+Copy_OpenCV_Lib(${target_var})
 
-add_custom_command(TARGET VisionDemo
-    POST_BUILD COMMAND
-    ${CMAKE_COMMAND} -E copy_directory #拷贝整个图片文件夹
-    "${VISION_IMAGE_DIR}" #图片文件夹路径
-    "$<TARGET_FILE_DIR:VisionDemo>/images"  #拷贝到VisionDemo这个可执行文件生成的路径/images下
+# ============================== 发布部署 =====================
+get_target_property(QT_QMAKE Qt5::qmake IMPORTED_LOCATION)
+get_filename_component(QT_BIN_DIR "${QT_QMAKE}" DIRECTORY)
+message("QT_BIN_DIR=${QT_BIN_DIR}")
+
+set(MY_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/dist)
+install(TARGETS ${target_var} 
+ RUNTIME DESTINATION ${MY_INSTALL_PREFIX}/bin
+ LIBRARY DESTINATION ${MY_INSTALL_PREFIX}/lib
+ PUBLIC_HEADER DESTINATION ${MY_INSTALL_PREFIX}/include
 )
 
-# # ==============获取qmake所在的路径，用windeployqt来打包=============
-option(WindeployQt ON)
+file(TO_NATIVE_PATH "${QT_BIN_DIR}/windeployqt.exe" var_cmd)
+string(REPLACE "\\" "\\\\" var_cmd "${var_cmd}")
 
-if(WindeployQt)
-    get_target_property(qt_qmake Qt5::qmake IMPORTED_LOCATION)
-    get_filename_component(qt_bin "${qt_qmake}" DIRECTORY)
+message("var_cmd=${var_cmd}")
 
-    # 部署工具必须来自链接时使用的 Qt，不能沿用旧套件中的工具。
-    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${qt_bin}")
-
-    if(WINDEPLOYQT_EXECUTABLE)
-        add_custom_command(TARGET VisionDemo POST_BUILD COMMAND "${WINDEPLOYQT_EXECUTABLE}" "$<TARGET_FILE:VisionDemo>")
-            
-    endif()
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+    set(var ${target_var}d.exe)
+else()
+    set(var ${target_var}.exe)
 endif()
+
+install(CODE "
+file(WRITE \"${MY_INSTALL_PREFIX}/bin/deploy_${var}.bat\" 
+\"\\\"\" ${var_cmd} \"\\\" ${var} --plugindir \"
+\"\\\"\" %cd%\\\\plugins \"\\\"\"
+\" --no-angle --no-opengl-sw --designer --sql --xml --network --serialport --serialbus\"
+)
+"
+)
+
+
+
+# add_custom_command(TARGET VisionDemo
+#     POST_BUILD COMMAND
+#     ${CMAKE_COMMAND} -E copy_directory #拷贝整个图片文件夹
+#     "${VISION_IMAGE_DIR}" #图片文件夹路径
+#     "$<TARGET_FILE_DIR:VisionDemo>/images"  #拷贝到VisionDemo这个可执行文件生成的路径/images下
+# )
+
+# # # ==============获取qmake所在的路径，用windeployqt来打包=============
+# option(WindeployQt ON)
+
+# if(WindeployQt)
+#     get_target_property(qt_qmake Qt5::qmake IMPORTED_LOCATION)
+#     get_filename_component(qt_bin "${qt_qmake}" DIRECTORY)
+
+#     # 部署工具必须来自链接时使用的 Qt，不能沿用旧套件中的工具。
+#     find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${qt_bin}")
+
+#     if(WINDEPLOYQT_EXECUTABLE)
+#         add_custom_command(TARGET VisionDemo POST_BUILD COMMAND "${WINDEPLOYQT_EXECUTABLE}" "$<TARGET_FILE:VisionDemo>")
+            
+#     endif()
+# endif()
