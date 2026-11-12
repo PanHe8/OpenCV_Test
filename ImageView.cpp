@@ -32,6 +32,9 @@ void ImageView::setImage(const QImage& image)
     scene_.clear();
     circles_.clear();
     mouseInViewport_ = false;
+    fieldCenterVisible_ = false;
+    circleOffsetsVisible_ = false;
+    pixelCoordinatesVisible_ = false;
     image_ = image;
     if (!image.isNull()) scene_.addPixmap(QPixmap::fromImage(image));
     scene_.setSceneRect(QRectF(image.rect()));
@@ -42,6 +45,7 @@ void ImageView::setImage(const QImage& image)
 void ImageView::setCircles(const std::vector<vision::Circle>& circles)
 {
     circles_ = circles;
+    circleOffsetsVisible_ = false;
     for (auto* item : overlays_) {
         scene_.removeItem(item);
         delete item;
@@ -122,6 +126,14 @@ void ImageView::contextMenuEvent(QContextMenuEvent* event)
         viewport()->update();
     });
 
+    menu.addSeparator();
+    auto* clearAction = menu.addAction(QStringLiteral("清空窗口"));
+    clearAction->setObjectName(QStringLiteral("clearWindowAction"));
+    clearAction->setEnabled(!image_.isNull());
+    connect(clearAction, &QAction::triggered, this, [this] {
+        emit clearWindowRequested();
+    });
+
     menu.exec(event->globalPos());
     event->accept();
 }
@@ -177,7 +189,7 @@ void ImageView::paintEvent(QPaintEvent* event)
             lines << QStringLiteral("像素坐标：鼠标未在图像内");
         }
     }
-    if (fieldCenterVisible_) {
+    if (circleOffsetsVisible_) {
         const QPointF center(image_.width() / 2.0, image_.height() / 2.0);
         lines << QStringLiteral("视场中心：X=%1，Y=%2 像素")
             .arg(center.x(), 0, 'f', 2).arg(center.y(), 0, 'f', 2);
@@ -211,6 +223,22 @@ void ImageView::fitImage()
 {
     autoFit_ = true;
     if (!image_.isNull()) fitInView(QRectF(image_.rect()), Qt::KeepAspectRatio);
+}
+
+void ImageView::setCircleOffsetsVisible(bool visible)
+{
+    circleOffsetsVisible_ = visible && !circles_.empty();
+    viewport()->update();
+}
+
+void ImageView::clearAnnotations()
+{
+    setCircles({});
+    fieldCenterVisible_ = false;
+    circleOffsetsVisible_ = false;
+    pixelCoordinatesVisible_ = false;
+    mouseInViewport_ = false;
+    viewport()->update();
 }
 
 void ImageView::wheelEvent(QWheelEvent* event)

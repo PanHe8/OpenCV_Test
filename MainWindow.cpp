@@ -38,8 +38,8 @@ void MainWindow::on_openButton_clicked()
     this, QStringLiteral("选择图片"), document_.path(),
     QStringLiteral(
       "图片 (*.bmp *.png *.jpg *.jpeg *.tif *.tiff);;所有文件 (*)"));
-  if (!path.isEmpty() && loadImage(path))
-    runDetection();
+  if (!path.isEmpty())
+    loadImage(path);
 }
 
 void MainWindow::on_detectButton_clicked()
@@ -48,7 +48,20 @@ void MainWindow::on_detectButton_clicked()
 }
 void MainWindow::on_fitButton_clicked()
 {
-  ui_->imageView->fitImage();
+  if (!resultValid_ || result_.circles.empty()) {
+    statusBar()->showMessage(QStringLiteral("请先识别，得到有效的圆。"));
+    return;
+  }
+  ui_->imageView->setCircleOffsetsVisible(true);
+  statusBar()->showMessage(QStringLiteral("已显示圆心与视场中心的坐标差值"));
+}
+
+void MainWindow::on_imageView_clearWindowRequested()
+{
+  invalidateResults();
+  ui_->imageView->clearAnnotations();
+  ui_->summaryLabel->setText(QStringLiteral("已清空窗口，仅显示原图，请点击识别。"));
+  statusBar()->showMessage(QStringLiteral("已清空窗口，仅保留原图"));
 }
 void MainWindow::on_clearLogButton_clicked()
 {
@@ -113,6 +126,7 @@ void MainWindow::invalidateResults()
 {
   result_ = vision::DetectionResult();
   resultValid_ = false;
+  ui_->fitButton->setEnabled(false);
   ui_->resultsTable->setRowCount(0);
   ui_->imageView->setCircles({});
   ui_->summaryLabel->setText(
@@ -198,6 +212,7 @@ bool MainWindow::runDetection()
   QApplication::restoreOverrideCursor();
   resultValid_ = true;
   ui_->imageView->setCircles(result_.circles);
+  ui_->fitButton->setEnabled(!result_.circles.empty());
   ui_->resultsTable->setRowCount(static_cast<int>(result_.circles.size()));
   for (int i = 0; i < ui_->resultsTable->rowCount(); ++i) {
     const auto& c = result_.circles[i];

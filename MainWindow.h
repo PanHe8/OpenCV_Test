@@ -24,6 +24,7 @@ private slots:
   void on_openButton_clicked();
   void on_detectButton_clicked();
   void on_fitButton_clicked();
+  void on_imageView_clearWindowRequested();
   void on_exportButton_clicked();
   void on_clearLogButton_clicked();
   void on_minRadiusSpin_valueChanged(double value);

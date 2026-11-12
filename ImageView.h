@@ -6,11 +6,17 @@
 // 图像显示控件：绘制检测结果，并处理缩放和平移。
 class ImageView : public QGraphicsView
 {
+  Q_OBJECT
 public:
   explicit ImageView(QWidget* parent = nullptr);
   void setImage(const QImage& image);
   void setCircles(const std::vector<vision::Circle>& circles);
   void fitImage();
+  void setCircleOffsetsVisible(bool visible);
+  void clearAnnotations();
+
+signals:
+  void clearWindowRequested();
 
 protected:
   void wheelEvent(QWheelEvent* event) override;
@@ -28,6 +34,7 @@ private:
   QList<QGraphicsItem*> overlays_;
   std::vector<vision::Circle> circles_;
   bool fieldCenterVisible_ = false;
+  bool circleOffsetsVisible_ = false;
   bool pixelCoordinatesVisible_ = false;
   bool mouseInViewport_ = false;
   QPoint mousePosition_;

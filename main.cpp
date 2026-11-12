@@ -30,8 +30,6 @@ int main(int argc, char* argv[])
           window.findChild<QPushButton*>(QStringLiteral("detectButton"));
         if (detectButton)
           detectButton->click();
-      } else {
-        window.runDetection();
       }
     }
     if (smoke) {

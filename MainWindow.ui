@@ -27,8 +27,8 @@
         <item>
          <layout class="QHBoxLayout" name="buttonLayout">
           <item><widget class="QPushButton" name="openButton"><property name="text"><string>打开图片</string></property></widget></item>
-          <item><widget class="QPushButton" name="detectButton"><property name="enabled"><bool>false</bool></property><property name="text"><string>识别并拟合</string></property></widget></item>
-          <item><widget class="QPushButton" name="fitButton"><property name="text"><string>适应窗口</string></property></widget></item>
+          <item><widget class="QPushButton" name="detectButton"><property name="enabled"><bool>false</bool></property><property name="text"><string>识别</string></property></widget></item>
+          <item><widget class="QPushButton" name="fitButton"><property name="enabled"><bool>false</bool></property><property name="text"><string>拟合</string></property><property name="toolTip"><string>显示识别到的圆心相对视场中心的 X、Y 像素差值。</string></property></widget></item>
          </layout>
         </item>
         <item>
@@ -150,7 +150,7 @@
         <item>
          <widget class="QLabel" name="noteLabel">
           <property name="text"><string>坐标以原图左上角为原点，长度单位为像素。
-绿色圆为拟合轮廓，红色小十字为圆心。滚轮缩放，拖动平移。</string></property>
+点击识别显示圆，点击拟合显示圆心差值；右键菜单独立控制中心线、像素坐标和自适应图像。</string></property>
           <property name="wordWrap"><bool>true</bool></property>
          </widget>
         </item>
