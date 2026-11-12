@@ -22,6 +22,7 @@ protected:
   void wheelEvent(QWheelEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
   void mousePressEvent(QMouseEvent* event) override;
+  void mouseDoubleClickEvent(QMouseEvent* event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
   bool viewportEvent(QEvent* event) override;
   void contextMenuEvent(QContextMenuEvent* event) override;

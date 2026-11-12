@@ -23,7 +23,7 @@ ImageView::ImageView(QWidget* parent) : QGraphicsView(parent), scene_(this)
     setMinimumSize(420, 360);
     setMouseTracking(true);
     viewport()->setMouseTracking(true);
-    setToolTip(QStringLiteral("右键打开图像菜单；滚轮缩放图像"));
+    setToolTip(QStringLiteral("左键双击自适应图像；右键打开菜单；滚轮缩放图像"));
 }
 
 void ImageView::setImage(const QImage& image)
@@ -86,6 +86,16 @@ void ImageView::mousePressEvent(QMouseEvent* event)
         return;
     }
     QGraphicsView::mousePressEvent(event);
+}
+
+void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton) {
+        fitImage();
+        event->accept();
+        return;
+    }
+    QGraphicsView::mouseDoubleClickEvent(event);
 }
 
 void ImageView::contextMenuEvent(QContextMenuEvent* event)
