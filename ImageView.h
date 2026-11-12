@@ -15,10 +15,21 @@ public:
 protected:
   void wheelEvent(QWheelEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
+  void mousePressEvent(QMouseEvent* event) override;
+  void mouseMoveEvent(QMouseEvent* event) override;
+  bool viewportEvent(QEvent* event) override;
+  void contextMenuEvent(QContextMenuEvent* event) override;
+  void drawForeground(QPainter* painter, const QRectF& rect) override;
+  void paintEvent(QPaintEvent* event) override;
 
 private:
   QGraphicsScene scene_;
   QImage image_;
   QList<QGraphicsItem*> overlays_;
+  std::vector<vision::Circle> circles_;
+  bool fieldCenterVisible_ = false;
+  bool pixelCoordinatesVisible_ = false;
+  bool mouseInViewport_ = false;
+  QPoint mousePosition_;
   bool autoFit_ = true;
 };
