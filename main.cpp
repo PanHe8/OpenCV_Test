@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
     const bool loaded = window.loadImage(path);
     if (loaded) {
       if (smoke) {
-        // 通过按钮验证 .ui 中的名称能自动连接到 clicked 槽。
+        // 通过按钮验证源码中的 clicked 信号连接。
         auto* detectButton =
           window.findChild<QPushButton*>(QStringLiteral("detectButton"));
         if (detectButton)

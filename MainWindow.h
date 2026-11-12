@@ -20,22 +20,16 @@ public:
   bool saveReport(const QString& path) const;
 
 private slots:
-  // setupUi 内部通过 connectSlotsByName 自动连接。
-  void on_openButton_clicked();
-  void on_detectButton_clicked();
-  void on_fitButton_clicked();
-  void on_imageView_clearWindowRequested();
-  void on_exportButton_clicked();
-  void on_clearLogButton_clicked();
-  void on_minRadiusSpin_valueChanged(double value);
-  void on_maxRadiusSpin_valueChanged(double value);
-  void on_circularitySpin_valueChanged(double value);
-  void on_fitErrorSpin_valueChanged(double value);
-  void on_thresholdSpin_valueChanged(int value);
-  void on_foregroundCombo_currentIndexChanged(int index);
-  void on_autoThresholdCheck_toggled(bool checked);
+  void openImage();
+  void detectCircles();
+  void showCircleOffsets();
+  void clearWindow();
+  void exportResults();
+  void clearLog();
+  void setAutoThreshold(bool checked);
 
 private:
+  void connectSignals();
   void invalidateResults();
   void appendLog(const QString& text);
   vision::DetectionParameters parameters() const;

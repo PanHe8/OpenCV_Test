@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget* parent)
   , ui_(new Ui::MainWindow)
 {
   ui_->setupUi(this);
+  connectSignals();
   ui_->splitter->setSizes({ 720, 640 });
   ui_->resultEdit->setFont(
     QFontDatabase::systemFont(QFontDatabase::FixedFont));
@@ -32,7 +33,32 @@ MainWindow::~MainWindow()
   delete ui_;
 }
 
-void MainWindow::on_openButton_clicked()
+void MainWindow::connectSignals()
+{
+  // 所有界面连接集中写在源码中，不使用 on_ 命名自动连接。
+  connect(ui_->openButton, &QPushButton::clicked, this, &MainWindow::openImage);
+  connect(ui_->detectButton, &QPushButton::clicked, this, &MainWindow::detectCircles);
+  connect(ui_->fitButton, &QPushButton::clicked, this, &MainWindow::showCircleOffsets);
+  connect(ui_->imageView, &ImageView::clearWindowRequested, this, &MainWindow::clearWindow);
+  connect(ui_->exportButton, &QPushButton::clicked, this, &MainWindow::exportResults);
+  connect(ui_->clearLogButton, &QPushButton::clicked, this, &MainWindow::clearLog);
+  connect(ui_->minRadiusSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+          this, &MainWindow::invalidateResults);
+  connect(ui_->maxRadiusSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+          this, &MainWindow::invalidateResults);
+  connect(ui_->circularitySpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+          this, &MainWindow::invalidateResults);
+  connect(ui_->fitErrorSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+          this, &MainWindow::invalidateResults);
+  connect(ui_->thresholdSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+          this, &MainWindow::invalidateResults);
+  connect(ui_->foregroundCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+          this, &MainWindow::invalidateResults);
+  connect(ui_->autoThresholdCheck, &QCheckBox::toggled,
+          this, &MainWindow::setAutoThreshold);
+}
+
+void MainWindow::openImage()
 {
   const QString path = QFileDialog::getOpenFileName(
     this, QStringLiteral("选择图片"), document_.path(),
@@ -42,11 +68,11 @@ void MainWindow::on_openButton_clicked()
     loadImage(path);
 }
 
-void MainWindow::on_detectButton_clicked()
+void MainWindow::detectCircles()
 {
   runDetection();
 }
-void MainWindow::on_fitButton_clicked()
+void MainWindow::showCircleOffsets()
 {
   if (!resultValid_ || result_.circles.empty()) {
     statusBar()->showMessage(QStringLiteral("请先识别，得到有效的圆。"));
@@ -56,19 +82,19 @@ void MainWindow::on_fitButton_clicked()
   statusBar()->showMessage(QStringLiteral("已显示圆心与视场中心的坐标差值"));
 }
 
-void MainWindow::on_imageView_clearWindowRequested()
+void MainWindow::clearWindow()
 {
   invalidateResults();
   ui_->imageView->clearAnnotations();
   ui_->summaryLabel->setText(QStringLiteral("已清空窗口，仅显示原图，请点击识别。"));
   statusBar()->showMessage(QStringLiteral("已清空窗口，仅保留原图"));
 }
-void MainWindow::on_clearLogButton_clicked()
+void MainWindow::clearLog()
 {
   ui_->resultEdit->clear();
 }
 
-void MainWindow::on_exportButton_clicked()
+void MainWindow::exportResults()
 {
   if (!resultValid_) {
     statusBar()->showMessage(QStringLiteral("请先执行识别，得到有效结果。"));
@@ -86,32 +112,7 @@ void MainWindow::on_exportButton_clicked()
   appendLog(message);
 }
 
-void MainWindow::on_minRadiusSpin_valueChanged(double)
-{
-  invalidateResults();
-}
-void MainWindow::on_maxRadiusSpin_valueChanged(double)
-{
-  invalidateResults();
-}
-void MainWindow::on_circularitySpin_valueChanged(double)
-{
-  invalidateResults();
-}
-void MainWindow::on_fitErrorSpin_valueChanged(double)
-{
-  invalidateResults();
-}
-void MainWindow::on_thresholdSpin_valueChanged(int)
-{
-  invalidateResults();
-}
-void MainWindow::on_foregroundCombo_currentIndexChanged(int)
-{
-  invalidateResults();
-}
-
-void MainWindow::on_autoThresholdCheck_toggled(bool checked)
+void MainWindow::setAutoThreshold(bool checked)
 {
   ui_->thresholdSpin->setEnabled(!checked);
   invalidateResults();
